@@ -1,0 +1,2 @@
+# bashs
+shell script collection
