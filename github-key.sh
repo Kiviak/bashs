@@ -1,5 +1,6 @@
 #!/bin/bash
 #add a new ssh key to github
+
 echo "github ssh key: start..."
 echo "Enter your GitHub email address: "  
 read user_email
