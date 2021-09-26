@@ -1,5 +1,6 @@
 #!/bin/bash
 #add a new ssh key to github
+#you only need input your email and think a title(name)
 
 echo "github ssh key: start..."
 echo "Enter your GitHub email address: "  
@@ -7,7 +8,7 @@ read user_email
 ssh-keygen -t ed25519 -C $user_email
 eval `ssh-agent -s`
 ssh-add ~/.ssh/id_ed25519
-echo "your ssh public key is below,add it to your account:"
+echo "your ssh public key is below:"
 cat ~/.ssh/id_ed25519.pub
 KEY=$(cat ~/.ssh/id_ed25519.pub)
 echo "input the name of the ssh key:"
