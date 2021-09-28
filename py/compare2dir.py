@@ -31,8 +31,8 @@ if __name__=='__main__':
                 with open(file,"rb") as f:
                     hash_256=hashlib.sha256()
 
-                    # Read and update hash string value in blocks of 4K
-                    for byte_block in iter(lambda: f.read(4096),b""):
+                    # Read and update hash string value in blocks of 4K*1024*10(that is 40MB)
+                    for byte_block in iter(lambda: f.read(4096*1024*10),b""):
                         hash_256.update(byte_block)
 
                     hex_str=hash_256.hexdigest() 
