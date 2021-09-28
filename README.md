@@ -1,2 +1,2 @@
 # bashs
-shell script collection
+shell and python script collection.

@@ -31,8 +31,8 @@ if __name__=='__main__':
             for key in hash_list:
                 hash_obj[key]=hash_funs[key]()
 
-            # Read and update hash string value in blocks of 4K
-            for byte_block in iter(lambda: f.read(4096),b""):
+            # Read and update hash string value in blocks of 4K*1024*10(that is 40MB)
+            for byte_block in iter(lambda: f.read(4096*1024*10),b""):
                 for key in hash_obj:
                     hash_obj[key].update(byte_block)
             print(filename)
