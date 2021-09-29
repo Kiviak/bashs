@@ -18,30 +18,66 @@ if __name__=='__main__':
     
     mqueue=[]
     res=[]
+    weight_list=['B','KB','MB','GB','TB']
+    hash_funs={
+        'md5':hashlib.md5,
+        'sh1':hashlib.sha1,
+        'sha256':hashlib.sha256,
+        'blake2b':hashlib.blake2b,
+        'blake2s':hashlib.blake2s,
+        }
+    hash_use='md5'
+
+    print('start:')
+    print('~'*50)
+
     for item in path_list:
+        i=0
+        file_size=0
         mqueue.append(item)
         dir_deep=len(item.parts)
         dir_hash={}
         while len(mqueue)!=0:
             file=mqueue.pop(0)
             if file.is_dir() and not file.is_symlink():
-                for item in file.iterdir():
-                    mqueue.append(item)
+                for item2 in file.iterdir():
+                    mqueue.append(item2)
             elif file.is_file() and not file.is_symlink():
+                i+=1
+                msize=file.stat().st_size
+                file_size+=msize
+                # print('%s %8.2f %8.2f'%(str(file),msize/(1024**2),file_size/(1024**2)))
+
                 with open(file,"rb") as f:
-                    hash_256=hashlib.sha256()
+                    hash_current=hash_funs[hash_use]()
 
                     # Read and update hash string value in blocks of 4K*1024*10(that is 40MB)
                     for byte_block in iter(lambda: f.read(4096*1024*10),b""):
-                        hash_256.update(byte_block)
+                        hash_current.update(byte_block)
 
-                    hex_str=hash_256.hexdigest() 
+                    hex_str=hash_current.hexdigest() 
                     dir_list=file.resolve().parts[dir_deep-1:]
                     dir_hash['/'.join(dir_list)]=hex_str
                     # print('%-15s    %s'%('/'.join(dir_list),hex_str))
+                if not i%10:
+                    if file_size<1024:
+                        weight=0
+                    elif file_size<1024**2:
+                        weight=1
+                    elif file_size<1024**3:
+                        weight=2
+                    elif file_size<1024**4:
+                        weight=3
+                    else:
+                        weight=4
+                    print('no.%-8d  %6.3f %s  %s'%(i,file_size/(1024**weight),weight_list[weight],str(file)))
+        print('sum: %-8d  size: %8.3f %s %s'%(i,file_size/(1024**weight),weight_list[weight],str(item)))
+        print('+'*50)
         res.append(dir_hash)
 
-    # print('compare result:')
+    print('compare result:')
+    print('~'*50)
+
     print(str(path_list[0]),':\n')
     dir1,dir2=res[0],res[-1]
     i=0
