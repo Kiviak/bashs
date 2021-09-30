@@ -56,7 +56,7 @@ if __name__=='__main__':
                         hash_current.update(byte_block)
 
                     hex_str=hash_current.hexdigest() 
-                    dir_list=file.resolve().parts[dir_deep-1:]
+                    dir_list=file.resolve().parts[dir_deep:]
                     dir_hash['/'.join(dir_list)]=hex_str
                     # print('%-15s    %s'%('/'.join(dir_list),hex_str))
                 if not i%10:
