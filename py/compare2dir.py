@@ -4,6 +4,7 @@
 from pathlib import Path
 import sys
 import hashlib
+import shutil
 
 def get_weight(file_size):
     if file_size<1024:
@@ -18,6 +19,19 @@ def get_weight(file_size):
         weight=4
     
     return weight
+def files_copy(src,file_list,dst):
+    print('*'*50)
+    print('path: %s'%(str(src)))
+    print('sum: %d files'%(len(file_list)))
+    i=0
+    for file in file_list:
+        i+=1
+        src_file=Path(str(src)+'/'+file)
+        dst_file=Path(str(dst)+'/'+file)
+        dst_file.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(src_file,dst_file)
+        print('%-10d %s'%(i,file))
+
 
 if __name__=='__main__':
     
@@ -86,6 +100,8 @@ if __name__=='__main__':
 
     print(str(path_list[0]),':\n')
     dir1,dir2=res[0],res[-1]
+    dir1_diff=[]
+    dir2_diff=[]
     i=0
     for key in dir1:
         if key in dir2 and dir1[key]==dir2[key]:
@@ -93,6 +109,7 @@ if __name__=='__main__':
         else:
             i+=1
             print('%-10d %s'%(i,key))
+            dir1_diff.append(key)
             # print('%-15s    %s'%(key,dir1[key]))
 
     print('-'*50)
@@ -106,5 +123,24 @@ if __name__=='__main__':
         else:
             i+=1
             print('%-10d %s'%(i,key))
+            dir2_diff.append(key)
             # print('%-15s    %s'%(key,dir2[key]))
+    
+    print('-'*50)
+    print('-'*50)
+    print('FILE MOVE:')
+    print('1: 1 ---> 2')
+    print('2: 2 ---> 1')
+    print('3: 2 <--> 1')
+    print('4: quit')
+    choice=int(input('your choice:'))
+    if choice==1:
+        files_copy(path_list[0],dir1_diff,path_list[1])
+    elif choice==2:
+        files_copy(path_list[1],dir2_diff,path_list[0])
+    elif choice==3:
+        files_copy(path_list[0],dir1_diff,path_list[1])
+        files_copy(path_list[1],dir2_diff,path_list[0])
+    else:
+        exit(0)
     
