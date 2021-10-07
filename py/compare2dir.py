@@ -5,6 +5,20 @@ from pathlib import Path
 import sys
 import hashlib
 
+def get_weight(file_size):
+    if file_size<1024:
+        weight=0
+    elif file_size<1024**2:
+        weight=1
+    elif file_size<1024**3:
+        weight=2
+    elif file_size<1024**4:
+        weight=3
+    else:
+        weight=4
+    
+    return weight
+
 if __name__=='__main__':
     
     argc=len(sys.argv) 
@@ -60,17 +74,9 @@ if __name__=='__main__':
                     dir_hash['/'.join(dir_list)]=hex_str
                     # print('%-15s    %s'%('/'.join(dir_list),hex_str))
                 if not i%10:
-                    if file_size<1024:
-                        weight=0
-                    elif file_size<1024**2:
-                        weight=1
-                    elif file_size<1024**3:
-                        weight=2
-                    elif file_size<1024**4:
-                        weight=3
-                    else:
-                        weight=4
+                    weight=get_weight(file_size)
                     print('no.%-8d  %6.3f %s  %s'%(i,file_size/(1024**weight),weight_list[weight],str(file)))
+        weight=get_weight(file_size)
         print('sum: %-8d  size: %8.3f %s %s'%(i,file_size/(1024**weight),weight_list[weight],str(item)))
         print('+'*50)
         res.append(dir_hash)
