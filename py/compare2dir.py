@@ -1,10 +1,9 @@
 #!/usr/bin/python3
-#compare files of two paths according to sha256 and show their differences. 
 
 from pathlib import Path
-import sys
 import hashlib
 import shutil
+import argparse
 
 def get_weight(file_size):
     if file_size<1024:
@@ -35,14 +34,17 @@ def files_copy(src,file_list,dst):
 
 if __name__=='__main__':
     
-    argc=len(sys.argv) 
-    if argc!=3:
-        exit(1)
+    description='Compare files of two paths according to some hash algorithm and show their differences.'
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('path',nargs=2,type=str,help='path of files')
+    parser.add_argument('-hash',choices=['md5','sh1','sha256'],default='sha256',help='hash algorithms')
+    parser.add_argument('-n',type=int,default=10,help='a number,the gap of file to be displayed',dest='GAP')
+    args=parser.parse_args()
 
-    path_list=[Path(item).resolve() for item in sys.argv[1:]]
+    path_list=[Path(item).resolve() for item in args.path]
     for item in path_list:
         if not item.is_dir():
-            exit(2)
+            exit(1)
     
     mqueue=[]
     res=[]
@@ -54,10 +56,10 @@ if __name__=='__main__':
         'blake2b':hashlib.blake2b,
         'blake2s':hashlib.blake2s,
         }
-    hash_use='md5'
+    hash_use=args.hash
 
     print('start:')
-    print('~'*50)
+    print('-'*50)
 
     for item in path_list:
         i=0
@@ -65,6 +67,7 @@ if __name__=='__main__':
         mqueue.append(item)
         dir_deep=len(item.parts)
         dir_hash={}
+        print(str(item),':\n')
         while len(mqueue)!=0:
             file=mqueue.pop(0)
             if file.is_dir() and not file.is_symlink():
@@ -87,16 +90,16 @@ if __name__=='__main__':
                     dir_list=file.resolve().parts[dir_deep:]
                     dir_hash['/'.join(dir_list)]=hex_str
                     # print('%-15s    %s'%('/'.join(dir_list),hex_str))
-                if not i%10:
+                if not i%args.GAP:
                     weight=get_weight(file_size)
                     print('no.%-8d  %6.3f %s  %s'%(i,file_size/(1024**weight),weight_list[weight],str(file)))
         weight=get_weight(file_size)
-        print('sum: %-8d  size: %8.3f %s %s'%(i,file_size/(1024**weight),weight_list[weight],str(item)))
-        print('+'*50)
+        print('\nsum: %-8d  size: %8.3f %s'%(i,file_size/(1024**weight),weight_list[weight]))
+        print('-'*50)
         res.append(dir_hash)
 
     print('compare result:')
-    print('~'*50)
+    print('-'*50)
 
     print(str(path_list[0]),':\n')
     dir1,dir2=res[0],res[-1]
@@ -112,7 +115,6 @@ if __name__=='__main__':
             dir1_diff.append(key)
             # print('%-15s    %s'%(key,dir1[key]))
 
-    print('-'*50)
     print('-'*50)
 
     i=0
