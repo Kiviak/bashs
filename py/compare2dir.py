@@ -4,8 +4,9 @@ from pathlib import Path
 import hashlib
 import shutil
 import argparse
+from typing import List
 
-def get_weight(file_size):
+def get_weight(file_size:int)->int:
     if file_size<1024:
         weight=0
     elif file_size<1024**2:
@@ -18,7 +19,8 @@ def get_weight(file_size):
         weight=4
     
     return weight
-def files_copy(src,file_list,dst):
+
+def files_copy(src:Path,file_list:List[str],dst:Path)->None:
     print('*'*50)
     print('path: %s'%(str(src)))
     print('sum: %d files'%(len(file_list)))
